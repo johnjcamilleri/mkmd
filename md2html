@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+  then
+    echo "Usage: md2html <infile.md> [outfile.html]"
+    exit 1
+fi
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+INFILE=$1
+TMPFILE=_tmp.html
+
+if [ $# -eq 1 ]
+  then
+    OUTFILE=${INFILE%.*}.html
+  else
+    OUTFILE=$2
+fi
+
+http POST https://api.github.com/markdown/raw Content-Type:text/plain --output $TMPFILE < $INFILE
+sed -i '' 's/<table>/<table class="table">/' $TMPFILE
+cat $DIR/_pre.html $TMPFILE $DIR/_post.html > $OUTFILE
+rm -f $TMPFILE
